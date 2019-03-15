@@ -1,0 +1,6 @@
+---
+user:
+  webadmin:
+    exists: true
+    groups:
+      - webadmin

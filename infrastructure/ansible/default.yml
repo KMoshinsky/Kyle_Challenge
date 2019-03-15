@@ -1,0 +1,73 @@
+---
+  - hosts: all
+    become: yes
+
+    vars:
+      goss_tests:
+
+    pre_tasks:
+      - name: yum update
+        yum:
+          name: '*'
+          state: latest
+
+    tasks:
+      - name: add webadmin user
+        user:
+          name: webadmin
+          group: webadmin
+
+      - name: install httpd
+          yum:
+            name: httpd
+            state: present
+
+      - name: copy html to server
+        copy:
+          src: "{{ playbook_dir }}/files/index.html"
+          dest: /var/www/html/index.html
+          owner: webadmin
+          group: webadmin
+          mode: 0744
+
+      - name: allow 443 and 22
+        iptables:
+          chain: INPUT
+          destination_port: "{{ item }}"
+          jump: ACCEPT
+        with_items:
+          - 443
+          - 22
+        
+      - name: forward 80 to 443
+        iptables:
+          table: nat
+          chain: PREROUTING
+          in_interface: eth0
+          destination_port: 80
+          jump: REDIRECT
+          to_ports: 443
+          comment: Redirect web traffic to port 443
+
+      - name: block all other traffic
+        iptables:
+          chain: INPUT
+          jump: DROP
+
+      - name: start httpd
+        service:
+          name: httpd
+          state: started
+
+    post_tasks:
+      - name: copy goss tests
+        copy:
+          src: "{{ playbook_dir }}/files/goss/{{ item }}"
+          dest: "/tmp/{{ item }}"
+        with_items: "{{ goss_tests }}"
+
+      - name: run goss tests
+        goss:
+          path: "/tmp/{{ item }}"
+          format: documentation
+        with_items: "{{ goss_tests }}"
