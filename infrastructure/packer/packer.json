@@ -13,7 +13,6 @@
       "instance_type": "t2.micro",
       "ami_name": "SRE-Challenge_{{timestamp}}",
       "ami_description": "SRE Challenge Server",
-      "iam_instance_profile": "Packer",
       "ami_regions": "{{ user `region` }}"
     }],
     "provisioners": [{
