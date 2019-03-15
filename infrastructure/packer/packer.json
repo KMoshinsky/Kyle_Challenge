@@ -1,0 +1,43 @@
+{
+    "variables": {
+      "region": "us-east-1"
+    },
+    "builders": [{
+      "name": "aws",
+      "type": "amazon-ebs",
+      "profile": "packer",
+      "region": "{{ user `region` }}",
+      "ssh_username": "ec2-user",
+      "ssh_timeout": "10m",
+      "source_ami": "ami-0de53d8956e8dcf80",
+      "instance_type": "t2.micro",
+      "ami_name": "SRE-Challenge_{{timestamp}}",
+      "ami_description": "SRE Challenge Server",
+      "iam_instance_profile": "Packer",
+      "ami_regions": "{{ user `region` }}"
+    }],
+    "provisioners": [{
+        "type": "shell-local",
+        "command": "sleep 20"
+      },
+      {
+        "type": "ansible",
+        "playbook_file": "../ansible/default.yml",
+        "sftp_command": "/usr/libexec/openssh/sftp-server -e",
+        "extra_arguments": [
+          "-vvv"
+        ],
+        "ansible_env_vars": [
+          "ANSIBLE_HOST_KEY_CHECKING=False",
+          "ANSIBLE_SSH_PIPELINING=True",
+          "ANSIBLE_SCP_IF_SSH=y"
+        ]
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "sudo sync"
+        ]
+      }
+    ]
+  }
