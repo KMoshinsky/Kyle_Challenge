@@ -11,11 +11,3 @@ file:
     group: webadmin
     contains:
       - "Hello World!"
-
-port:
-  tcp:443:
-    listening: true
-  tcp:22:
-    listening: true
-  tcp:80:
-    listening: true
