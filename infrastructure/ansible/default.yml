@@ -12,6 +12,11 @@
           state: latest
 
     tasks:
+      - name: create webadmin group
+        group:
+          name: webadmin
+          state: present
+
       - name: add webadmin user
         user:
           name: webadmin
