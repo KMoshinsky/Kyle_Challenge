@@ -1,6 +1,6 @@
 # Kyle_Challenge
 
-SRE Challenge application project
+SRE Challenge application project as defined in `SRE_Challenge.pdf`
 
 ## Infrastructure
 
