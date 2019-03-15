@@ -18,9 +18,9 @@
           group: webadmin
 
       - name: install httpd
-          yum:
-            name: httpd
-            state: present
+        yum:
+          name: httpd
+          state: present
 
       - name: copy html to server
         copy:
