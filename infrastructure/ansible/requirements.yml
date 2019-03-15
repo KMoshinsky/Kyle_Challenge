@@ -1,0 +1,4 @@
+---
+- name: mcorbin.goss-module
+  src: https://github.com/mcorbin/goss-module
+  version: master

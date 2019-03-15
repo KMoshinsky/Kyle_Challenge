@@ -4,12 +4,17 @@
 
     vars:
       goss_tests:
+        - test_httpd.yml
+        - test_webuser.yml
 
     pre_tasks:
       - name: yum update
         yum:
           name: '*'
           state: latest
+
+    roles:
+      - role: mcorbin.goss-module
 
     tasks:
       - name: create webadmin group
@@ -67,14 +72,20 @@
           state: started
 
     post_tasks:
+      - name: create goss directory
+        file:
+          path: /opt/goss
+          state: directory
+          mode: 0755
+
       - name: copy goss tests
         copy:
           src: "{{ playbook_dir }}/files/goss/{{ item }}"
-          dest: "/tmp/{{ item }}"
+          dest: "/opt/goss/{{ item }}"
         with_items: "{{ goss_tests }}"
 
       - name: run goss tests
         goss:
-          path: "/tmp/{{ item }}"
+          path: "/opt/goss/{{ item }}"
           format: documentation
         with_items: "{{ goss_tests }}"
