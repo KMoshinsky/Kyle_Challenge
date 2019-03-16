@@ -1,0 +1,25 @@
+---
+service:
+  httpd:
+    running: true
+  firewalld:
+    running: true
+
+file:
+  /var/www/html/index.html:
+    exists: true
+    mode: "0744"
+    contains:
+      - "Hello World!"
+  
+  /etc/httpd/conf/httpd.conf:
+    exists: true
+    contains:
+      - 'Redirect "/" "https://ADDRPLACEHOLDER"'
+
+port:
+  tcp:80:
+    listening: true
+
+  tcp:443:
+    listening: true

@@ -4,8 +4,7 @@
 
     vars:
       goss_tests:
-        - test_httpd.yml
-        - test_webuser.yml
+        - test_apache.yml
 
     pre_tasks:
       - name: yum update
@@ -17,60 +16,47 @@
       - role: mcorbin.goss-module
 
     tasks:
-      - name: create webadmin group
-        group:
-          name: webadmin
-          state: present
-
-      - name: add webadmin user
-        user:
-          name: webadmin
-          group: webadmin
-
-      - name: install httpd
+      - name: install yum repos
         yum:
+          name: "{{ item }}"
+          state: latest
+        with_items:
+          - httpd
+          - mod_ssl
+          - firewalld
+
+      - name: start httpd
+        systemd:
           name: httpd
-          state: present
+          state: started
           enabled: yes
+
+      - name: forward http traffic to https
+        lineinfile:
+          path: /etc/httpd/conf/httpd.conf
+          insertafter: '^Listen 80'
+          line: "{{ item }}"
+        with_items:
+          - </VirtualHost>
+          -   Redirect "/" "https://ADDRPLACEHOLDER"
+          -   ServerName srechallenge
+          - <VirtualHost *:80>
 
       - name: copy html to server
         copy:
           src: "{{ playbook_dir }}/files/index.html"
           dest: /var/www/html/index.html
-          owner: webadmin
-          group: webadmin
           mode: 0744
 
-      - name: allow 443 and 22
-        iptables:
-          chain: INPUT
-          protocol: tcp
-          destination_port: "{{ item }}"
-          jump: ACCEPT
+      - name: open ports
+        firewalld:
+          port: "{{ item }}/tcp"
+          permanent: yes
+          state: enabled
         with_items:
-          - 443
           - 22
-        
-      - name: forward 80 to 443
-        iptables:
-          table: nat
-          chain: PREROUTING
-          in_interface: eth0
-          protocol: tcp
-          destination_port: 80
-          jump: REDIRECT
-          to_ports: 443
-          comment: Redirect web traffic to port 443
-
-      - name: block all other traffic
-        iptables:
-          chain: INPUT
-          jump: DROP
-
-      - name: start httpd
-        service:
-          name: httpd
-          state: started
+          - 80
+          - 443
 
     post_tasks:
       - name: create goss directory
