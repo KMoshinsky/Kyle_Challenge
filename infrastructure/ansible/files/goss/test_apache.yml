@@ -2,8 +2,11 @@
 service:
   httpd:
     running: true
+    enabled: true
+  
   firewalld:
     running: true
+    enabled: true
 
 file:
   /var/www/html/index.html:
@@ -17,9 +20,8 @@ file:
     contains:
       - 'Redirect "/" "https://ADDRPLACEHOLDER"'
 
-port:
-  tcp:80:
-    listening: true
-
-  tcp:443:
-    listening: true
+http:
+  http://localhost:
+    status: 200
+    body:
+      - "Hello World!"
