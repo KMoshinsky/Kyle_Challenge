@@ -1,3 +1,3 @@
-ami = "ami-07d00acafe7641fa3"
+ami = "ami-0805e7582afb9cf5e"
 
 key = "kyle_pair"
