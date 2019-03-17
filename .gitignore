@@ -1,2 +1,4 @@
 roles/
 default.retry
+.terraform
+*.backup

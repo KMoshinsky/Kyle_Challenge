@@ -1,0 +1,7 @@
+#cloud-config
+debug:
+  verbose: true
+
+runcmd:
+  - sed -i 's/ADDRPLACEHOLDER/'"$(curl ifconfig.me)"'/g' /etc/httpd/conf/httpd.conf
+  - systemctl restart httpd
