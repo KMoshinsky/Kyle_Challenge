@@ -1,4 +1,5 @@
 roles/
 default.retry
 .terraform
-*.backup
+*.tfstate*
+*.tfplan
